@@ -1,9 +1,10 @@
-const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const app = require('./app');
-const logger = require('./configs/logger.config');
+const dotenv = require('dotenv');
 
 dotenv.config({ path: './config.env' });
+
+const app = require('./app');
+const logger = require('./configs/logger.config');
 
 const DB = process.env.DATABASE;
 
