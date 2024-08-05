@@ -9,13 +9,14 @@ exports.aliasTopTours = async (req, res, next) => {
   } catch (err) {}
 };
 
-exports.getAllTours = async (req, res) => {
-  try {
-    /**Build The Query */
+class APIFeaatures {
+  constructor(query, queryString) {
+    this.query = query;
+    this.queryString = queryString;
+  }
 
-    //1A) Filtering
-    //Destructuing The Req.query
-    const queryObj = { ...req.query };
+  filter() {
+    const queryObj = { ...req.this.queryString };
     //Specifying the Fields to that needs to be excluded from QueryObj
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     //Looping Over the Excludedfields and Deleting it from the query Ibj
@@ -25,15 +26,23 @@ exports.getAllTours = async (req, res) => {
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
 
-    let query = Tour.find(JSON.parse(queryStr));
+    this.query.find(JSON.parse(queryStr));
+  }
 
+  sort() {
     //2) Sorting
-    if (req.query.sort) {
+    if (this.queryString.sort) {
       const sortBy = req.query.sort.split(',').join(' ');
-      query = query.sort(sortBy);
+      this.query = this.query.sort(sortBy);
     } else {
-      query = query.sort('-createdAt');
+      this.query = this.query.sort('-createdAt');
     }
+  }
+}
+
+exports.getAllTours = async (req, res) => {
+  try {
+    /**Build The Query */
 
     //3) Field Limiting
     if (req.query.fields) {
@@ -59,7 +68,9 @@ exports.getAllTours = async (req, res) => {
     }
 
     /**Execute the Query */
-    const tours = await query;
+    const features = new APIFeatures(Tour.find(), req.query).filter().sort();
+
+    const tours = await features.query;
 
     res.status(200).json({
       status: 'sucess',
