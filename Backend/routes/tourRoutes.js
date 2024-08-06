@@ -8,10 +8,7 @@ router
   .route('/top-5-cheap')
   .get(tourRoutes.aliasTopTours, tourRoutes.getAllTours);
 
-router
-  .route('/')
-  .get(tourRoutes.getAllTours)
-  .post(tourRoutes.createTour);
+router.route('/').get(tourRoutes.getAllTours).post(tourRoutes.createTour);
 
 router
   .route('/:id')
